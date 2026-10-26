@@ -1,0 +1,139 @@
+.app-sidebar {
+width: 250px;
+min-width: 250px;
+min-height: 100vh;
+padding: 26px 18px;
+box-sizing: border-box;
+display: flex;
+flex-direction: column;
+background: #2b1c16;
+color: #fffaf5;
+}
+
+.app-sidebar-brand {
+display: flex;
+align-items: center;
+gap: 12px;
+padding: 0 8px 30px;
+}
+
+.app-sidebar-icon {
+display: grid;
+place-items: center;
+width: 44px;
+height: 44px;
+flex-shrink: 0;
+border-radius: 12px;
+background: #795548;
+font-size: 24px;
+}
+
+.app-sidebar-brand h2 {
+margin: 0 0 5px;
+font-size: 20px;
+}
+
+.app-sidebar-brand span {
+color: #cbb8ad;
+font-size: 11px;
+}
+
+.app-sidebar-nav {
+display: flex;
+flex-direction: column;
+gap: 7px;
+}
+
+.app-nav-item {
+display: flex;
+align-items: center;
+gap: 12px;
+width: 100%;
+padding: 13px 14px;
+border: none;
+border-radius: 9px;
+background: transparent;
+color: #e9ddd6;
+font: inherit;
+text-align: left;
+cursor: pointer;
+transition: background 0.2s ease, color 0.2s ease;
+}
+
+.app-nav-item:hover {
+background: #49352b;
+color: #fff;
+}
+
+.app-nav-active {
+background: #795548;
+color: #fff;
+font-weight: 600;
+}
+
+.app-nav-icon {
+width: 22px;
+text-align: center;
+font-size: 17px;
+}
+
+.app-sidebar-divider {
+height: 1px;
+margin: 15px 4px;
+background: #58443a;
+}
+
+.app-logout-item {
+color: #ffd4c7;
+}
+
+.app-sidebar-footer {
+display: grid;
+grid-template-columns: 9px 1fr;
+align-items: center;
+column-gap: 8px;
+margin-top: auto;
+padding: 20px 8px 0;
+color: #e9ddd6;
+font-size: 12px;
+}
+
+.app-sidebar-footer small {
+grid-column: 2;
+margin-top: 5px;
+color: #bca99e;
+font-size: 10px;
+}
+
+.app-sidebar-status {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: #69c98b;
+}
+
+@media (max-width: 700px) {
+.app-sidebar {
+width: 100%;
+min-width: 0;
+min-height: auto;
+padding: 16px;
+}
+
+.app-sidebar-brand {
+padding-bottom: 16px;
+}
+
+.app-sidebar-nav {
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.app-sidebar-divider {
+display: none;
+}
+
+.app-sidebar-footer {
+display: none;
+}
+}

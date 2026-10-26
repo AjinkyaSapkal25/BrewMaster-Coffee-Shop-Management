@@ -1,0 +1,33 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    url: ${BREWMASTER_DB_URL:jdbc:mysql://localhost:3306/brewmaster_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${BREWMASTER_DB_USERNAME:root}
+    password: ${BREWMASTER_DB_PASSWORD:root}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  thymeleaf:
+    cache: false
+
+logging:
+  level:
+    org.springframework: INFO
+    org.hibernate.SQL: DEBUG
+
+jwt:
+  # This fallback is for local development only. Override it outside localhost.
+  secret: ${BREWMASTER_JWT_SECRET:local-dev-only-change-this-secret-key-before-deployment}
+  expiration: ${BREWMASTER_JWT_EXPIRATION:3600000}
+
+app:
+  cors:
+    allowed-origin: ${BREWMASTER_FRONTEND_ORIGIN:http://localhost:5173}

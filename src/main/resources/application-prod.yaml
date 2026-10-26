@@ -1,0 +1,28 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    url: ${BREWMASTER_DB_URL}
+    username: ${BREWMASTER_DB_USERNAME}
+    password: ${BREWMASTER_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  thymeleaf:
+    cache: true
+
+jwt:
+  secret: ${BREWMASTER_JWT_SECRET}
+  expiration: ${BREWMASTER_JWT_EXPIRATION:3600000}
+
+app:
+  cors:
+    allowed-origin: ${BREWMASTER_FRONTEND_ORIGIN}
+
+logging:
+  level:
+    root: WARN
