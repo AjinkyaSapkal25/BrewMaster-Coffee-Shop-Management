@@ -1,178 +1,548 @@
 # BrewMaster — Coffee Shop Management System
 
-BrewMaster is a full-stack coffee shop management application built with a Spring Boot REST API, a React frontend, and MySQL. It demonstrates role-based operations for managing menu products, categories, users, customer orders, and a business summary dashboard.
+A full-stack coffee shop management platform built with **Java 21, Spring Boot, Spring Security, React, and MySQL**. BrewMaster provides role-based access to product management, category management, order processing, user administration, and business dashboard operations.
 
-> **Project status:** Core workflows are implemented. Automated test coverage, deployment hardening, and production deployment remain areas for continued improvement. This repository does not currently implement inventory, suppliers, customer CRM, billing/POS, email notifications, or audit logs; those are possible future enhancements, not current features.
+The application follows a layered backend architecture and uses JWT authentication to secure REST APIs and enforce permissions across four operational roles.
 
-## Features
+---
 
-- **Authentication:** Registration and login, BCrypt password hashing, JWT bearer-token authentication, stateless Spring Security configuration.
-- **Role-based access:** `ROLE_ADMIN`, `ROLE_MANAGER`, `ROLE_CASHIER`, and `ROLE_BARISTA` permissions enforced by the backend.
-- **User administration:** View users and update user roles (administrator-only).
-- **Menu management:** Create, view, update, search, paginate, sort, and soft-delete products; manage categories.
-- **Order management:** Create orders with one or more available products, calculate totals from stored product prices, view orders, filter by status, update permitted status transitions, and soft-delete orders.
-- **Dashboard:** Summary counts and sales information for authorized administrators and managers.
-- **Validation and errors:** Jakarta Bean Validation and a centralized JSON exception response format.
-- **API documentation:** Swagger UI / OpenAPI, including bearer-token authentication support.
-- **Data integrity:** JPA entity relationships, transactional order creation/status updates, and optimistic locking via `@Version` on the base entity.
-- **Frontend:** React pages for login, dashboard, products, categories, orders, and user-role management, with role-aware controls.
+## Project Overview
 
-## Technology stack
+BrewMaster is designed to simplify coffee shop operations through a centralized management application.
 
-| Layer | Technologies |
+It provides separate access permissions for:
+
+- **ADMIN** — Manages users, products, categories, orders, and administrative operations.
+- **MANAGER** — Manages categories and orders and accesses business dashboard information.
+- **CASHIER** — Handles order creation and sales-related operations.
+- **BARISTA** — Accesses order information and performs permitted order status updates.
+
+The backend is responsible for authentication, authorization, business logic, validation, and database operations.
+
+---
+
+## Key Features
+
+### 1. Authentication and Security
+
+- User registration and login.
+- JWT-based authentication.
+- BCrypt password hashing.
+- Stateless Spring Security configuration.
+- Role-based endpoint authorization.
+- Protected REST APIs.
+- Token-based frontend authentication.
+
+### 2. User Management
+
+- Retrieve registered users.
+- Manage user roles.
+- Restrict administrative user operations to ADMIN.
+- Support four operational roles.
+
+### 3. Product Management
+
+- Create products.
+- Retrieve product information.
+- Update existing products.
+- Soft-delete products.
+- Search products by name.
+- Filter products by category and availability.
+- Pagination and sorting support.
+- Exclude deleted products from normal product listings.
+
+### 4. Category Management
+
+- Create categories.
+- Retrieve categories.
+- Update category information.
+- Manage category availability.
+- Restrict category operations according to user roles.
+
+### 5. Order Management
+
+- Create orders containing multiple products.
+- Validate product availability.
+- Calculate order totals using stored product prices.
+- Retrieve order information.
+- Filter orders by status.
+- Update order statuses.
+- Soft-delete orders.
+- Use transactional operations for order processing.
+
+### 6. Business Dashboard
+
+- Business summary information.
+- Sales-related statistics.
+- Order and product summaries.
+- Dashboard access for authorized administrators and managers.
+
+### 7. API Documentation
+
+- Swagger UI integration.
+- OpenAPI documentation.
+- Documented REST endpoints.
+- JWT Bearer authentication support for secured API testing.
+
+### 8. Backend Architecture
+
+- Controller-Service-Repository architecture.
+- DTO-based request and response handling.
+- MapStruct-based object mapping.
+- Centralized exception handling.
+- Jakarta Bean Validation.
+- JPA entity relationships.
+- Transaction management.
+- Optimistic locking through `@Version` in the base entity.
+
+---
+
+## Technology Stack
+
+| Category | Technologies |
 |---|---|
-| Backend | Java 21, Spring Boot 3.5.x, Spring Web, Spring Security, Spring Data JPA, Hibernate, Jakarta Validation |
-| Authentication | JJWT, BCrypt password encoder |
+| Programming Language | Java 21 |
+| Backend Framework | Spring Boot 3.5.4 |
+| REST APIs | Spring Web |
+| Security | Spring Security |
+| Authentication | JWT (JJWT), BCrypt |
+| ORM | Hibernate |
+| Persistence | Spring Data JPA |
 | Database | MySQL |
-| Frontend | React, React Router, Axios, Vite |
-| API documentation | springdoc-openapi / Swagger UI |
-| Build and tests | Maven, JUnit 5, Spring Boot Test, Spring Security Test |
+| Frontend | React 19 |
+| Routing | React Router |
+| HTTP Client | Axios |
+| Frontend Build Tool | Vite |
+| Validation | Jakarta Bean Validation |
+| API Documentation | Swagger / OpenAPI |
+| Object Mapping | MapStruct |
+| Build Tool | Maven |
+| Testing | JUnit 5, Spring Boot Test, Spring Security Test |
 
-## Architecture
+---
+
+## Application Architecture
+
+BrewMaster follows a layered architecture that separates frontend presentation, backend business logic, security, and database operations.
 
 ```text
-Browser (React + Vite)
-        |
-        | HTTP / JSON; JWT sent in Authorization: Bearer <token>
-        v
-Spring Boot REST API (port 8080)
-  Controllers -> Services -> Repositories -> JPA/Hibernate
-        |                                  |
-        | Spring Security + JWT             v
-        |                               MySQL
-        v
-Role-based endpoint authorization
+                 React Frontend
+                   (Vite)
+                     |
+                     | HTTP / JSON
+                     | JWT Bearer Token
+                     |
+                     v
+              Spring Boot REST API
+                     |
+              Spring Security
+                     |
+              JWT Authentication
+                     |
+                     v
+                  Controllers
+                     |
+                     v
+                   Services
+                     |
+                     v
+                 Repositories
+                     |
+                     v
+                Spring Data JPA
+                     |
+                     v
+                   MySQL
 ```
 
-The frontend is a separate application. It calls the backend REST API; business rules and authorization must be enforced by the backend, not only by hiding frontend controls.
+### Backend Architecture Layers
 
-## Prerequisites
+| Layer | Responsibility |
+|---|---|
+| Controller | Handles HTTP requests and responses |
+| Service | Implements application business logic |
+| Repository | Performs database operations |
+| Entity | Represents database tables |
+| DTO | Transfers request and response data |
+| Mapper | Converts entities and DTOs |
+| Security | Handles authentication and authorization |
+| Exception | Provides centralized error handling |
+| Config | Contains application and API configuration |
 
-- JDK 21
-- Maven 3.9+
-- Node.js 20.19+ or 22.12+ recommended for the Vite version in this project
-- npm
+---
+
+## Role-Based Access Control
+
+BrewMaster uses four roles to control access to application functionality.
+
+| Feature | ADMIN | MANAGER | CASHIER | BARISTA |
+|---|:---:|:---:|:---:|:---:|
+| Login | Yes | Yes | Yes | Yes |
+| View Products | Yes | Yes | Yes | Yes |
+| Manage Products | Yes | No | No | No |
+| View Categories | Yes | Yes | Yes | Yes |
+| Manage Categories | Yes | Yes | No | No |
+| View Orders | Yes | Yes | Yes | Yes |
+| Create Orders | Yes | Yes | Yes | No |
+| Update Order Status | Yes | Yes | No | Yes |
+| Delete Orders | Yes | Yes | No | No |
+| Manage Users and Roles | Yes | No | No | No |
+| Business Dashboard | Yes | Yes | No | No |
+
+Authorization is enforced at the backend level using Spring Security and role-based access rules. Frontend controls provide an additional role-aware user experience.
+
+---
+
+## Project Structure
+
+```text
+brewmaster/
+│
+├── src/
+│   ├── main/
+│   │   ├── java/com/brewmaster/
+│   │   │   ├── config/
+│   │   │   ├── controller/
+│   │   │   ├── dto/
+│   │   │   │   ├── request/
+│   │   │   │   └── response/
+│   │   │   ├── entity/
+│   │   │   ├── enums/
+│   │   │   ├── exception/
+│   │   │   ├── mapper/
+│   │   │   ├── repository/
+│   │   │   ├── security/
+│   │   │   │   ├── config/
+│   │   │   │   ├── filter/
+│   │   │   │   └── jwt/
+│   │   │   └── service/
+│   │   │       ├── interfaces/
+│   │   │       └── impl/
+│   │   │
+│   │   └── resources/
+│   │       ├── application.yaml
+│   │       ├── application-dev.yaml
+│   │       └── application-prod.yaml
+│   │
+│   └── test/
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   ├── vite.config.js
+│   └── .env.example
+│
+├── .mvn/
+├── mvnw
+├── mvnw.cmd
+├── pom.xml
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Getting Started
+
+Follow these instructions to run BrewMaster locally.
+
+### Prerequisites
+
+Install the following:
+
+- Java Development Kit (JDK) 21
 - MySQL 8.x
+- Node.js 20.19+ or 22.12+
+- npm
+- Git
 
-## Local setup
+### 1. Clone the Repository
 
-### 1. Get the source
+```bash
+git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_BREWMASTER_REPOSITORY.git
+```
 
-Clone the repository or extract the project archive. The backend `pom.xml` is in the project root and the React application is in `frontend/`.
+Open the project in IntelliJ IDEA.
 
-### 2. Create the database
+Replace the example repository address with your actual GitHub repository address.
+
+### 2. Create the MySQL Database
+
+Open MySQL Workbench or your MySQL client and execute:
 
 ```sql
 CREATE DATABASE brewmaster_db;
 ```
 
-### 3. Configure the backend
+### 3. Configure Backend Environment
 
-The default profile is `dev`. Configure local settings in `src/main/resources/application-dev.yaml` or supply environment variables:
+The default Spring profile is `dev`.
 
-| Variable | Development default | Purpose |
-|---|---|---|
-| `BREWMASTER_DB_URL` | `jdbc:mysql://localhost:3306/brewmaster_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC` | JDBC URL |
-| `BREWMASTER_DB_USERNAME` | `root` | Local MySQL username |
-| `BREWMASTER_DB_PASSWORD` | `root` | Local MySQL password; change to match your machine |
-| `BREWMASTER_JWT_SECRET` | Local-development-only fallback | JWT signing key; set a private secret for every non-local environment |
-| `BREWMASTER_JWT_EXPIRATION` | `3600000` | Token lifetime in milliseconds (one hour) |
-| `BREWMASTER_FRONTEND_ORIGIN` | `http://localhost:5173` | Allowed browser origin for CORS |
+Backend configuration is maintained in:
 
-Example PowerShell session (replace the database password with your own):
-
-```powershell
-$env:BREWMASTER_DB_USERNAME = "root"
-$env:BREWMASTER_DB_PASSWORD = "your-local-mysql-password"
-$env:BREWMASTER_JWT_SECRET = "replace-with-a-private-secret-of-at-least-32-characters"
-$env:BREWMASTER_FRONTEND_ORIGIN = "http://localhost:5173"
+```text
+src/main/resources/application-dev.yaml
 ```
 
-For local development, the existing defaults preserve the common `root` / `root` setup. **Never use development defaults or commit real credentials in a deployed environment.** Use a long, random JWT signing secret stored in your environment/secret manager.
+The application supports the following environment variables:
 
-### 4. Start the backend
+| Variable | Purpose |
+|---|---|
+| `SERVER_PORT` | Backend server port |
+| `BREWMASTER_DB_URL` | MySQL JDBC connection URL |
+| `BREWMASTER_DB_USERNAME` | Database username |
+| `BREWMASTER_DB_PASSWORD` | Database password |
+| `BREWMASTER_JWT_SECRET` | JWT signing secret |
+| `BREWMASTER_JWT_EXPIRATION` | JWT expiration time in milliseconds |
+| `BREWMASTER_FRONTEND_ORIGIN` | Allowed frontend origin for CORS |
 
-From the project root:
+The development configuration contains local defaults. Change the database credentials to match your MySQL installation.
 
-```bash
-mvn spring-boot:run
+For non-local environments, configure private credentials through environment variables and use a strong, randomly generated JWT signing secret.
+
+### 4. Run the Backend
+
+Open a terminal in the project root.
+
+Using Windows Command Prompt:
+
+```cmd
+mvnw.cmd clean test
 ```
 
-The API listens on `http://localhost:8080` by default. Spring creates the four role records (`ADMIN`, `MANAGER`, `CASHIER`, `BARISTA`) at startup if they do not exist. It does **not** create a default administrator account. Public registration assigns the `BARISTA` role; provision an administrator securely for local testing rather than relying on a shared default account.
+Start the Spring Boot application:
 
-### 5. Start the frontend
+```cmd
+mvnw.cmd spring-boot:run
+```
 
-In a second terminal:
+Backend API:
 
-```bash
+```text
+http://localhost:8080
+```
+
+### 5. Run the Frontend
+
+Open a second terminal.
+
+Navigate to the frontend directory:
+
+```cmd
 cd frontend
+```
+
+Install dependencies:
+
+```cmd
 npm install
+```
+
+Start the frontend:
+
+```cmd
 npm run dev
 ```
 
-Open `http://localhost:5173`.
+Frontend application:
 
-The frontend API base URL defaults to `http://localhost:8080`. To change it, create `frontend/.env.local` based on `frontend/.env.example` and set `VITE_API_BASE_URL`. Vite environment values are public client-side configuration; never put secrets in frontend environment variables.
+```text
+http://localhost:5173
+```
 
-### 6. Open API documentation
+The frontend uses the following default API base URL:
 
-With the backend running, open:
+```text
+http://localhost:8080
+```
 
-- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
-- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+To configure a different backend URL, create a local `.env.local` file using `frontend/.env.example` as a reference.
 
-Use the **Authorize** control in Swagger UI to provide a JWT as a bearer token when testing secured endpoints.
+### 6. Access Swagger Documentation
 
-## Main API routes
+After starting the backend, open:
 
-| Route | Purpose | Access (high level) |
+**Swagger UI**
+
+```text
+http://localhost:8080/swagger-ui/index.html
+```
+
+**OpenAPI JSON**
+
+```text
+http://localhost:8080/v3/api-docs
+```
+
+Use the Swagger Authorize option to provide a valid JWT Bearer token when testing protected endpoints.
+
+---
+
+## Main REST API Modules
+
+| Module | Base Route | Functionality |
 |---|---|---|
-| `/api/auth/register` | Register a user | Public; new users receive BARISTA role |
-| `/api/auth/login` | Obtain a JWT | Public |
-| `/api/users/**` | User listing and role administration | ADMIN |
-| `/api/products/**` | Product operations | Reads: all four roles; writes: ADMIN only |
-| `/api/categories/**` | Category operations | Reads: all four roles; writes: ADMIN, MANAGER |
-| `/api/orders/**` | Order management | Reads: all four roles; create: ADMIN, MANAGER, CASHIER; status updates: ADMIN, MANAGER, BARISTA; delete: ADMIN, MANAGER |
-| `/api/dashboard/**` | Business summary | ADMIN, MANAGER |
+| Authentication | `/api/auth` | Registration and login |
+| Users | `/api/users` | User management and role administration |
+| Products | `/api/products` | Product CRUD, search, filtering and pagination |
+| Categories | `/api/categories` | Category management |
+| Orders | `/api/orders` | Order creation, retrieval and status management |
+| Dashboard | `/api/dashboard` | Business summary information |
 
-Exact route behavior and response models are documented in Swagger UI. The backend remains the source of truth for authorization.
+Exact endpoint details, request models, response models, and authorization requirements are available in Swagger UI.
 
-## Tests and build
+---
 
-Backend tests:
+## Important Business Rules
 
-```bash
-mvn test
+### Order Status Lifecycle
+
+BrewMaster uses the following order statuses:
+
+```text
+PENDING
+   |
+   v
+CONFIRMED
+   |
+   v
+PREPARING
+   |
+   v
+READY
+   |
+   v
+COMPLETED
 ```
 
-Package the backend:
+Orders can also be marked as:
 
-```bash
-mvn clean package
+```text
+CANCELLED
 ```
 
-Frontend lint and production build:
+Permitted status transitions are controlled by the backend.
 
-```bash
-cd frontend
+### Data Management
+
+- Products support soft deletion.
+- Orders support soft deletion.
+- Normal product queries exclude deleted products.
+- Order totals are calculated using stored product prices.
+- Order processing uses transactional service operations.
+
+---
+
+## Testing and Build
+
+### Backend Tests
+
+Run:
+
+```cmd
+mvnw.cmd test
+```
+
+### Backend Clean Build
+
+```cmd
+mvnw.cmd clean package
+```
+
+### Frontend Lint
+
+From the frontend directory:
+
+```cmd
 npm run lint
+```
+
+### Frontend Production Build
+
+```cmd
 npm run build
 ```
 
-The current automated backend test suite is small (4 tests were passing in the latest reported local run: 1 application-context test and 3 order-service tests). This is a useful baseline, but it does not replace broader repository, controller, authentication, authorization, and validation tests. Expand coverage as part of continued hardening.
+The automated test suite currently provides a baseline for backend verification. Broader integration, security, controller, and validation test coverage remains an area for improvement.
 
-## Security and deployment notes
+---
 
-- JWT tokens are bearer credentials; do not log or share them.
-- Set database credentials and the JWT secret through environment variables/secret management outside local development.
-- Configure the exact deployed frontend origin in `BREWMASTER_FRONTEND_ORIGIN`.
-- The `dev` profile uses Hibernate `ddl-auto: update` and SQL logging for local development. The `prod` profile uses `ddl-auto: validate`; apply reviewed database migrations before production use.
-- The project is not yet represented as a fully production-hardened deployment. Before public deployment, add comprehensive automated tests, managed schema migrations, HTTPS, monitoring/logging, and deployment-specific security configuration.
+## Configuration Profiles
 
-## Screenshots
+BrewMaster includes separate development and production configurations.
 
-Add current screenshots of Login, Dashboard, Products, Categories, Orders, and User Management here before publishing the repository. Avoid screenshots containing real personal data, passwords, or JWTs.
+| Configuration | Development | Production |
+|---|---|---|
+| Profile | `dev` | `prod` |
+| Hibernate DDL | `update` | `validate` |
+| SQL Logging | Enabled | Disabled |
+| Thymeleaf Cache | Disabled | Enabled |
+| Database Credentials | Local defaults available | Environment variables required |
+| JWT Secret | Local development fallback | Environment variable required |
 
-## Roadmap
+The production profile expects the database schema to exist and be compatible with the JPA entities. Reviewed database migrations should be used before a production deployment.
 
-Potential future enhancements (not currently implemented): inventory/low-stock alerts, audit trails, automated integration/security tests, Docker Compose for the API and database, CI checks, and cloud deployment.
+---
+
+## Future Enhancements
+
+Potential improvements for future versions include:
+
+- Inventory and stock management.
+- Low-stock notifications.
+- Supplier management.
+- Customer management.
+- Billing and POS integration.
+- Email notifications.
+- Audit history.
+- Expanded automated integration and security tests.
+- CI/CD pipeline.
+- Cloud deployment.
+
+These are planned enhancements and are not represented as existing application functionality.
+
+## Application Screenshots
+
+### 1. Login Page
+![Login Page](screenshots/01-login.jpeg)
+
+### 2. Admin Dashboard
+![Admin Dashboard](screenshots/02-admin-dashboard.jpeg)
+
+### 3. Product Management
+![Product Management](screenshots/03-product-management.jpeg)
+
+### 4. Category Management
+![Category Management](screenshots/04-category-management.jpeg)
+
+### 5. Order Management
+![Order Management](screenshots/05-order-management.jpeg)
+
+### 6. User Management — Admin Access
+![User Management](screenshots/06-user-management.jpeg)
+
+### 7. Manager Dashboard
+![Manager Dashboard](screenshots/07-manager-dashboard.jpeg)
+
+### 8. Cashier Category Access
+![Cashier Category Access](screenshots/08-cashier-category-access.jpeg)
+
+### 9. Logout and Session Handling
+![Logout](screenshots/09-logout-session.jpeg)
+
+---
+
+## Author
+
+**Ajinkya Sapkal**
+
+GitHub: https://github.com/AjinkyaSapkal25
+
+---
+
+## Project
+
+**BrewMaster — Coffee Shop Management System**
+
+Built to demonstrate full-stack development using Java, Spring Boot, Spring Security, JWT, React, and MySQL.
