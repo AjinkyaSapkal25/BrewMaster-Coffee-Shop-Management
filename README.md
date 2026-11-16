@@ -260,7 +260,7 @@ Install the following:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/YOUR_BREWMASTER_REPOSITORY.git
+git clone https://github.com/AjinkyaSapkal25/BrewMaster-Coffee-Shop-Management.git
 ```
 
 Open the project in IntelliJ IDEA.
